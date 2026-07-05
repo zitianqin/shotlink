@@ -1,0 +1,37 @@
+.gitignore
+  s_92542594e82804::t_25ea0c24bb8d9d 1-8
+  s_92542594e82804::t_a02095fb12638f 9-10
+api/upload.ts
+  s_92542594e82804::t_16cf1fbabcd757 1-87
+tsconfig.json
+  s_92542594e82804::t_b92e3761cc5198 1-16
+src/index.ts
+  s_92542594e82804::t_1360f112bc0358 1-102
+vercel.json
+  s_92542594e82804::t_30c9e55e220aaf 3-4
+  s_92542594e82804::t_25608c9849c0f8 1-2,5-10
+README.md
+  s_92542594e82804::t_b0bc9fe6e7d121 1-120
+package.json
+  s_92542594e82804::t_096a5bcc2c3576 1-27
+public/index.html
+  s_92542594e82804::t_e876cc430b9934 1-12
+package-lock.json
+  s_92542594e82804::t_5923611c4df07f 1-3221
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b046e8159cfec04bc88e3a7f5b9bfc6f8eea7fc1",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
