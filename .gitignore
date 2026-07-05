@@ -1,10 +1,12 @@
 node_modules/
-dist/
 .vercel/
+.vercel
 .env
 .env.*
+.env*
 !.env.example
 *.log
 .DS_Store
-.vercel
-.env*
+
+# dist/ is intentionally committed so `npx github:zitianqin/shotlink` runs the
+# prebuilt MCP client without a build step. Rebuild with `npm run build`.

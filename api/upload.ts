@@ -1,35 +1,31 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { Req, Res } from "./_http.js";
 import { put } from "@vercel/blob";
-import { timingSafeEqual } from "node:crypto";
+import { isValidToken } from "./_tokens.js";
 
 // POST /api/upload
-//   Authorization: Bearer <UPLOAD_TOKEN>
+//   Authorization: Bearer <shotlink token>   (sl_...)
 //   Body (JSON): { filename?: string, contentType?: string, dataBase64: string }
-// -> 200 { url } where url is a public, unguessable Vercel Blob URL.
+// -> 200 { url } — a public, unguessable Vercel Blob URL.
 //
-// The powerful BLOB_READ_WRITE_TOKEN never leaves the server; callers only ever
-// hold the narrow UPLOAD_TOKEN, which can do nothing but hit this endpoint.
+// Guards: valid per-user token, image content types only, ~4MB max.
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+const MAX_BYTES = 4 * 1024 * 1024;
+
+export default async function handler(req: Req, res: Res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
-  const expected = process.env.UPLOAD_TOKEN;
-  if (!expected) {
+  const header = req.headers.authorization;
+  const auth = Array.isArray(header) ? header[0] : header ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!(await isValidToken(token))) {
     return res
-      .status(500)
-      .json({ error: "server_misconfigured", detail: "UPLOAD_TOKEN is not set" });
+      .status(401)
+      .json({ error: "unauthorized", detail: "missing or invalid shotlink token" });
   }
 
-  const header = req.headers.authorization ?? "";
-  const provided = header.startsWith("Bearer ") ? header.slice(7) : "";
-  if (!constantTimeEqual(provided, expected)) {
-    return res.status(401).json({ error: "unauthorized" });
-  }
-
-  // @vercel/node parses JSON bodies automatically.
   const body = (req.body ?? {}) as {
     filename?: unknown;
     contentType?: unknown;
@@ -42,6 +38,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .json({ error: "bad_request", detail: "dataBase64 (base64 string) is required" });
   }
 
+  const contentType =
+    typeof body.contentType === "string" && body.contentType ? body.contentType : undefined;
+  if (contentType && !contentType.startsWith("image/")) {
+    return res.status(415).json({ error: "unsupported_type", detail: "images only" });
+  }
+
   let buffer: Buffer;
   try {
     buffer = Buffer.from(body.dataBase64, "base64");
@@ -51,12 +53,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (buffer.length === 0) {
     return res.status(400).json({ error: "bad_request", detail: "decoded image is empty" });
   }
+  if (buffer.length > MAX_BYTES) {
+    return res
+      .status(413)
+      .json({ error: "too_large", detail: `image exceeds ${MAX_BYTES} bytes` });
+  }
 
   const filename = sanitizeFilename(
     typeof body.filename === "string" ? body.filename : undefined,
   );
-  const contentType =
-    typeof body.contentType === "string" && body.contentType ? body.contentType : undefined;
 
   try {
     const blob = await put(filename, buffer, {
@@ -69,13 +74,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const detail = err instanceof Error ? err.message : String(err);
     return res.status(502).json({ error: "blob_upload_failed", detail });
   }
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
 }
 
 // Keep only a safe basename; Blob's addRandomSuffix guarantees uniqueness anyway.

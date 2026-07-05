@@ -5,15 +5,23 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-// Thin MCP client for the Vercel upload function. Runs locally (stdio), reads a
-// local image, and returns a public capability URL you can paste into a PR body.
+// shotlink MCP client. Runs locally (stdio) so it can read local image files,
+// uploads them to the hosted shotlink endpoint, and returns a public URL.
 //
-// Configure via env:
-//   IMAGE_HOST_ENDPOINT  e.g. https://your-app.vercel.app/api/upload
-//   IMAGE_HOST_TOKEN     the UPLOAD_TOKEN the server checks
+// Config (in order of precedence):
+//   token:    --token=<sl_...>   or  SHOTLINK_TOKEN env
+//   endpoint: --endpoint=<url>   or  SHOTLINK_ENDPOINT env   (defaults to prod)
 
-const ENDPOINT = process.env.IMAGE_HOST_ENDPOINT;
-const TOKEN = process.env.IMAGE_HOST_TOKEN;
+const DEFAULT_ENDPOINT = "https://shotlink.vercel.app/api/upload";
+
+function argValue(name: string): string | undefined {
+  const prefix = `--${name}=`;
+  const hit = process.argv.find((a) => a.startsWith(prefix));
+  return hit ? hit.slice(prefix.length) : undefined;
+}
+
+const ENDPOINT = argValue("endpoint") ?? process.env.SHOTLINK_ENDPOINT ?? DEFAULT_ENDPOINT;
+const TOKEN = argValue("token") ?? process.env.SHOTLINK_TOKEN;
 
 const MIME_BY_EXT: Record<string, string> = {
   ".png": "image/png",
@@ -27,8 +35,12 @@ const MIME_BY_EXT: Record<string, string> = {
 };
 
 async function uploadImage(filePath: string, filename?: string): Promise<string> {
-  if (!ENDPOINT) throw new Error("IMAGE_HOST_ENDPOINT env var is not set");
-  if (!TOKEN) throw new Error("IMAGE_HOST_TOKEN env var is not set");
+  if (!TOKEN) {
+    throw new Error(
+      "No shotlink token. Pass --token=sl_... in the MCP args or set SHOTLINK_TOKEN. " +
+        "Get one at https://shotlink.vercel.app",
+    );
+  }
 
   const bytes = await readFile(filePath); // throws a clear ENOENT if missing
   const name = filename ?? basename(filePath);
@@ -62,16 +74,16 @@ async function uploadImage(filePath: string, filename?: string): Promise<string>
   return url;
 }
 
-const server = new McpServer({ name: "image-self-host", version: "0.1.0" });
+const server = new McpServer({ name: "shotlink", version: "0.2.0" });
 
 server.registerTool(
   "upload_image",
   {
     title: "Upload image",
     description:
-      "Upload a local image file to the configured image host and return a public, " +
-      "unguessable URL. Use it to embed screenshots in GitHub PR descriptions/comments " +
-      "(the URL renders inline, no browser or committed file needed).",
+      "Upload a local image file to shotlink and return a public, unguessable URL. " +
+      "Use it to embed screenshots in GitHub PR descriptions/comments (the URL renders " +
+      "inline, no browser or committed file needed).",
     inputSchema: {
       path: z.string().describe("Absolute path to the local image file to upload"),
       filename: z
