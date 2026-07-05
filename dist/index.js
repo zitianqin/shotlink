@@ -19,6 +19,7 @@ function argValue(name) {
 }
 const ENDPOINT = argValue("endpoint") ?? process.env.SHOTLINK_ENDPOINT ?? DEFAULT_ENDPOINT;
 const TOKEN = argValue("token") ?? process.env.SHOTLINK_TOKEN;
+const MAX_BYTES = 50 * 1024 * 1024;
 const MIME_BY_EXT = {
     ".png": "image/png",
     ".jpg": "image/jpeg",
@@ -37,13 +38,16 @@ async function uploadImage(filePath, filename) {
     const bytes = await readFile(filePath); // throws a clear ENOENT if missing
     const name = filename ?? basename(filePath);
     const contentType = MIME_BY_EXT[extname(name).toLowerCase()];
+    if (bytes.length > MAX_BYTES) {
+        throw new Error(`image is ${(bytes.length / 1048576).toFixed(1)}MB; shotlink's limit is 50MB`);
+    }
     // Direct-to-Blob client upload: the bytes go straight to Blob storage (not
     // through the function), so this isn't bound by Vercel's ~4.5MB body limit.
-    // /api/upload only authorizes it (validates the token in clientPayload).
+    // /api/upload only authorizes it (validates the token + size in clientPayload).
     const blob = await upload(name, bytes, {
         access: "public",
         handleUploadUrl: ENDPOINT,
-        clientPayload: JSON.stringify({ token: TOKEN }),
+        clientPayload: JSON.stringify({ token: TOKEN, size: bytes.length }),
         contentType,
         multipart: bytes.length > 8 * 1024 * 1024, // parallel parts for big files
     });

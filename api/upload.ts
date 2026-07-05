@@ -36,13 +36,21 @@ export default async function handler(req: Req, res: Res) {
       request: req,
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
         let token = "";
+        let size = 0;
         try {
-          token = (JSON.parse(clientPayload ?? "{}") as { token?: string }).token ?? "";
+          const p = JSON.parse(clientPayload ?? "{}") as { token?: string; size?: number };
+          token = p.token ?? "";
+          size = typeof p.size === "number" ? p.size : 0;
         } catch {
           /* falls through to unauthorized */
         }
         if (!(await isValidToken(token))) {
           throw new UnauthorizedError();
+        }
+        // maximumSizeInBytes is only enforced for single-request uploads, not
+        // multipart — so we also gate on the client-declared size here.
+        if (size > MAX_BYTES) {
+          throw new TooLargeError();
         }
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
@@ -60,6 +68,11 @@ export default async function handler(req: Req, res: Res) {
         .status(401)
         .json({ error: "unauthorized", detail: "missing or invalid shotlink token" });
     }
+    if (err instanceof TooLargeError) {
+      return res
+        .status(413)
+        .json({ error: "too_large", detail: `image exceeds ${MAX_BYTES} bytes (50MB)` });
+    }
     const detail = err instanceof Error ? err.message : String(err);
     return res.status(400).json({ error: "upload_failed", detail });
   }
@@ -69,5 +82,12 @@ class UnauthorizedError extends Error {
   constructor() {
     super("unauthorized");
     this.name = "UnauthorizedError";
+  }
+}
+
+class TooLargeError extends Error {
+  constructor() {
+    super("too_large");
+    this.name = "TooLargeError";
   }
 }
