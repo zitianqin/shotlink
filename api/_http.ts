@@ -3,6 +3,7 @@
 
 export interface Req {
   method?: string;
+  url?: string;
   headers: Record<string, string | string[] | undefined>;
   body?: unknown;
 }
@@ -10,5 +11,7 @@ export interface Req {
 export interface Res {
   status(code: number): Res;
   json(body: unknown): Res;
-  setHeader(name: string, value: string): void;
+  send(body: string): Res;
+  setHeader(name: string, value: string | string[]): void;
+  end(body?: string): void;
 }

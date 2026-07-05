@@ -78,9 +78,12 @@
 
   <h2>Get your setup command</h2>
   <div class="card">
-    <div class="row">
-      <input id="label" type="text" placeholder="Your name / machine (optional label)" autocomplete="off" />
-      <button id="gen">Generate</button>
+    <div id="signin-row" class="row">
+      <a href="/api/auth/login"><button id="signin">Sign in with GitHub</button></a>
+      <span class="hint" style="margin:0;">Edexia org members only.</span>
+    </div>
+    <div id="gen-row" class="row" style="display:none;">
+      <button id="gen">Generate my setup command</button>
     </div>
     <div id="result" class="result">
       <p style="margin:.25rem 0 .5rem;font-weight:600;">Paste this into your terminal:</p>
@@ -109,27 +112,49 @@
 <script>
   const $ = (id) => document.getElementById(id);
   const genBtn = $("gen"), result = $("result"), cmdEl = $("cmd"), errEl = $("error");
+  const signinRow = $("signin-row"), genRow = $("gen-row");
+  const params = new URLSearchParams(location.search);
+
+  const ERRORS = {
+    not_member: "That GitHub account isn't a member of the Edexia org.",
+    bad_request: "Sign-in expired or was invalid — please try again.",
+    auth_failed: "GitHub sign-in failed — please try again.",
+  };
+
+  // After a successful callback we land on /?authed=1 with a session cookie set.
+  if (params.get("authed") === "1") {
+    signinRow.style.display = "none";
+    genRow.style.display = "flex";
+  }
+  if (params.get("error")) {
+    errEl.textContent = ERRORS[params.get("error")] || "Sign-in error.";
+  }
 
   genBtn.addEventListener("click", async () => {
     errEl.textContent = "";
     genBtn.disabled = true;
     genBtn.textContent = "Generating…";
     try {
-      const label = $("label").value.trim();
       const res = await fetch("/api/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(label ? { label } : {}),
+        body: "{}",
       });
       const data = await res.json();
+      if (res.status === 401) {
+        // session expired — send them back through sign-in
+        signinRow.style.display = "flex";
+        genRow.style.display = "none";
+        throw new Error("Session expired — sign in again.");
+      }
       if (!res.ok) throw new Error(data.detail || data.error || ("HTTP " + res.status));
       cmdEl.textContent = data.command;
       result.classList.add("show");
     } catch (e) {
-      errEl.textContent = "Could not generate a token: " + e.message;
+      errEl.textContent = e.message;
     } finally {
       genBtn.disabled = false;
-      genBtn.textContent = "Generate";
+      genBtn.textContent = "Generate my setup command";
     }
   });
 

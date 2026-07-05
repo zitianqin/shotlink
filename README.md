@@ -39,8 +39,11 @@ anonymously. Anyone with a link can view that image; nobody can guess it. Fine f
 UI screenshots; treat links to PII-bearing images as sensitive. Uploads are
 image-only and capped at 50 MB. Tokens are personal and revocable.
 
-> **v1 note:** token issuance is open (self-serve, unlisted URL). A GitHub org
-> login gate on the *Generate* button is the planned fast-follow.
+**Token issuance is gated** behind GitHub OAuth: only active members of the
+`Edexia` org (via *Sign in with GitHub*, `read:org` scope) can mint a token.
+Sessions are signed cookies (no store); tokens are labelled with the minter's
+GitHub login. Env: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `ALLOWED_GITHUB_ORG`,
+`SESSION_SECRET`.
 
 ## Operating it (host only)
 
