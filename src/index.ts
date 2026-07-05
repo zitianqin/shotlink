@@ -12,7 +12,7 @@ import { z } from "zod";
 //   token:    --token=<sl_...>   or  SHOTLINK_TOKEN env
 //   endpoint: --endpoint=<url>   or  SHOTLINK_ENDPOINT env   (defaults to prod)
 
-const DEFAULT_ENDPOINT = "https://shotlink.vercel.app/api/upload";
+const DEFAULT_ENDPOINT = "https://shotlink-zitian-qins-projects.vercel.app/api/upload";
 
 function argValue(name: string): string | undefined {
   const prefix = `--${name}=`;
@@ -38,7 +38,7 @@ async function uploadImage(filePath: string, filename?: string): Promise<string>
   if (!TOKEN) {
     throw new Error(
       "No shotlink token. Pass --token=sl_... in the MCP args or set SHOTLINK_TOKEN. " +
-        "Get one at https://shotlink.vercel.app",
+        "Get one at https://shotlink-zitian-qins-projects.vercel.app",
     );
   }
 

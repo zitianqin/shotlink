@@ -22,7 +22,7 @@ teammate: claude mcp add shotlink -- npx -y github:zitianqin/shotlink --token=sl
 
 ## For teammates (zero setup)
 
-1. Go to **https://shotlink.vercel.app**, click **Generate**, copy the command.
+1. Go to **https://shotlink-zitian-qins-projects.vercel.app**, click **Generate**, copy the command.
 2. Paste it into your terminal (it's `claude mcp add shotlink -- npx -y …`).
 3. Restart Claude Code. Now ask it to add a screenshot to a PR, or call
    `upload_image(path="/abs/path/shot.png")` directly.
