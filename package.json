@@ -1,0 +1,27 @@
+{
+  "name": "image-self-host-mcp",
+  "version": "0.1.0",
+  "description": "Upload local images to Vercel Blob and get an unguessable public URL — served via a thin Vercel function and an MCP tool. Built to embed screenshots in GitHub PRs without a browser.",
+  "type": "module",
+  "bin": {
+    "image-self-host-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "prepare": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@vercel/blob": "^0.27.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vercel/node": "^3.2.0",
+    "typescript": "^5.6.0"
+  }
+}

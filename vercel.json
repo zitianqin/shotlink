@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "echo 'functions-only: no build step'",
+  "outputDirectory": "public",
+  "functions": {
+    "api/upload.ts": {
+      "maxDuration": 30
+    }
+  }
+}
