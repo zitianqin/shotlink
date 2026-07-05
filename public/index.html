@@ -7,104 +7,159 @@
 <title>shotlink</title>
 <style>
   :root {
-    --bg: #ffffff; --fg: #18181b; --muted: #6b7280; --line: #e5e7eb;
-    --card: #f9fafb; --code-bg: #0f1117; --code-fg: #e6e8ef; --accent: #4f46e5;
-    --accent-fg: #ffffff; --pill: #eef2ff; --pill-fg: #4338ca; --ok: #16a34a;
+    --bg: #fbfbfd; --panel: #ffffff; --fg: #14141a; --muted: #6b7280;
+    --line: #e7e7ec; --line-strong: #d6d6de; --field: #ffffff;
+    --code-bg: #0d1017; --code-fg: #e8eaf0; --code-line: #23262f;
+    --accent: #5b53e8; --accent-hov: #4a42d6; --accent-fg: #ffffff;
+    --pill: #eeeafd; --pill-fg: #4b3fd0; --err: #dc2626; --ring: rgba(91,83,232,.28);
+    --shadow: 0 1px 2px rgba(20,20,26,.04), 0 8px 30px rgba(20,20,26,.06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0b0b0d; --fg: #ececf1; --muted: #9ca3af; --line: #26262b;
-      --card: #141417; --code-bg: #050608; --code-fg: #e6e8ef; --accent: #6366f1;
-      --accent-fg: #ffffff; --pill: #1e1b32; --pill-fg: #a5b4fc; --ok: #34d399;
+      --bg: #08080b; --panel: #101015; --fg: #f3f3f7; --muted: #9a9aa6;
+      --line: #23232b; --line-strong: #30303a; --field: #17171d;
+      --code-bg: #050609; --code-fg: #e8eaf0; --code-line: #20232c;
+      --accent: #6d64f2; --accent-hov: #7f77f5; --accent-fg: #ffffff;
+      --pill: #211d3d; --pill-fg: #b3aaf9; --err: #f87171; --ring: rgba(109,100,242,.35);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 40px rgba(0,0,0,.5);
     }
   }
-  :root[data-theme="light"] { --bg:#fff; --fg:#18181b; --muted:#6b7280; --line:#e5e7eb; --card:#f9fafb; --code-bg:#0f1117; --code-fg:#e6e8ef; --accent:#4f46e5; --accent-fg:#fff; --pill:#eef2ff; --pill-fg:#4338ca; --ok:#16a34a; }
-  :root[data-theme="dark"] { --bg:#0b0b0d; --fg:#ececf1; --muted:#9ca3af; --line:#26262b; --card:#141417; --code-bg:#050608; --code-fg:#e6e8ef; --accent:#6366f1; --accent-fg:#fff; --pill:#1e1b32; --pill-fg:#a5b4fc; --ok:#34d399; }
+  :root[data-theme="light"] { --bg:#fbfbfd; --panel:#fff; --fg:#14141a; --muted:#6b7280; --line:#e7e7ec; --line-strong:#d6d6de; --field:#fff; --code-bg:#0d1017; --code-fg:#e8eaf0; --code-line:#23262f; --accent:#5b53e8; --accent-hov:#4a42d6; --accent-fg:#fff; --pill:#eeeafd; --pill-fg:#4b3fd0; --err:#dc2626; --ring:rgba(91,83,232,.28); --shadow:0 1px 2px rgba(20,20,26,.04),0 8px 30px rgba(20,20,26,.06); }
+  :root[data-theme="dark"] { --bg:#08080b; --panel:#101015; --fg:#f3f3f7; --muted:#9a9aa6; --line:#23232b; --line-strong:#30303a; --field:#17171d; --code-bg:#050609; --code-fg:#e8eaf0; --code-line:#20232c; --accent:#6d64f2; --accent-hov:#7f77f5; --accent-fg:#fff; --pill:#211d3d; --pill-fg:#b3aaf9; --err:#f87171; --ring:rgba(109,100,242,.35); --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 40px rgba(0,0,0,.5); }
+
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0; background: var(--bg); color: var(--fg);
-    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   }
-  .wrap { max-width: 44rem; margin: 0 auto; padding: 4rem 1.25rem 6rem; }
-  .pill { display:inline-block; font-size:.72rem; font-weight:600; letter-spacing:.04em;
-    text-transform:uppercase; background:var(--pill); color:var(--pill-fg);
-    padding:.25rem .6rem; border-radius:999px; margin-bottom:1rem; }
-  h1 { font-size:2.4rem; line-height:1.1; margin:0 0 .5rem; letter-spacing:-.03em; }
-  .lede { font-size:1.15rem; color:var(--muted); margin:0; }
-  h2 { font-size:1.15rem; margin:2.75rem 0 .85rem; letter-spacing:-.01em; }
-  p { margin:0 0 1rem; }
-  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
-  code { background:var(--card); padding:.12em .4em; border-radius:5px; font-size:.9em;
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1.5rem; }
-  .row { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
-  input[type=text] {
-    flex:1; min-width:12rem; font-size:1rem; padding:.7rem .85rem; border-radius:9px;
-    border:1px solid var(--line); background:var(--bg); color:var(--fg);
+  /* soft accent glow behind the hero */
+  body::before {
+    content: ""; position: fixed; inset: -20% 0 auto 0; height: 420px; z-index: 0;
+    background: radial-gradient(60% 100% at 50% 0, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+    pointer-events: none;
   }
+  .wrap { position: relative; z-index: 1; max-width: 46rem; margin: 0 auto; padding: 4.5rem 1.5rem 6rem; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: .4rem; font-size: .7rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; background: var(--pill); color: var(--pill-fg);
+    padding: .32rem .7rem; border-radius: 999px; margin-bottom: 1.15rem;
+  }
+  h1 { font-size: 3rem; line-height: 1.02; margin: 0 0 .65rem; letter-spacing: -.045em; font-weight: 800; }
+  .lede { font-size: 1.16rem; color: var(--muted); margin: 0; max-width: 34rem; }
+  h2 { font-size: .95rem; font-weight: 700; letter-spacing: -.01em; margin: 3rem 0 1rem;
+    text-transform: none; color: var(--fg); }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 1.4rem; box-shadow: var(--shadow);
+  }
+  .fields { display: grid; grid-template-columns: 1fr 1fr auto; gap: .6rem; }
+  @media (max-width: 560px) { .fields { grid-template-columns: 1fr; } }
+  input[type=text], input[type=password] {
+    width: 100%; height: 3rem; font-size: .98rem; padding: 0 .95rem; border-radius: 11px;
+    border: 1px solid var(--line-strong); background: var(--field); color: var(--fg);
+    transition: border-color .15s, box-shadow .15s; font-family: inherit;
+  }
+  input::placeholder { color: color-mix(in srgb, var(--muted) 85%, transparent); }
+  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
   button {
-    font:inherit; font-weight:600; cursor:pointer; border:0; border-radius:9px;
-    padding:.7rem 1.1rem; background:var(--accent); color:var(--accent-fg); transition:opacity .15s;
+    height: 3rem; font: 600 .98rem/1 inherit; cursor: pointer; border: 0; border-radius: 11px;
+    padding: 0 1.4rem; background: var(--accent); color: var(--accent-fg); white-space: nowrap;
+    transition: background .15s, transform .05s, box-shadow .15s;
+    box-shadow: 0 1px 2px rgba(20,20,26,.12);
   }
-  button:hover { opacity:.9; } button:disabled { opacity:.55; cursor:default; }
-  .result { margin-top:1.25rem; display:none; }
-  .result.show { display:block; }
-  pre {
-    background:var(--code-bg); color:var(--code-fg); border-radius:10px; padding:1rem 1.1rem;
-    overflow-x:auto; margin:0; position:relative;
+  button:hover { background: var(--accent-hov); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: .6; cursor: default; }
+
+  .result { margin-top: 1.2rem; display: none; }
+  .result.show { display: block; animation: rise .28s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .result-label { font-size: .8rem; font-weight: 600; color: var(--muted); margin: 0 0 .5rem; }
+
+  .terminal { border-radius: 12px; overflow: hidden; border: 1px solid var(--code-line); background: var(--code-bg); }
+  .term-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .55rem .7rem .55rem .9rem; border-bottom: 1px solid var(--code-line);
+    background: color-mix(in srgb, var(--code-bg) 82%, #ffffff);
   }
-  pre code { background:none; padding:0; color:inherit; font-size:.85rem; line-height:1.6; }
+  .dots { display: inline-flex; gap: .4rem; }
+  .dots i { width: .68rem; height: .68rem; border-radius: 50%; background: #3a3f4b; }
+  .dots i:nth-child(1) { background: #ff5f57; } .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
   .copy {
-    position:absolute; top:.6rem; right:.6rem; font-size:.72rem; padding:.3rem .6rem;
-    background:rgba(255,255,255,.12); color:#fff;
+    height: auto; padding: .32rem .7rem; font-size: .76rem; font-weight: 600; border-radius: 7px;
+    background: rgba(255,255,255,.09); color: #d7d9e0; box-shadow: none;
   }
-  .hint { font-size:.9rem; color:var(--muted); margin-top:.6rem; }
-  .steps { padding-left:1.2rem; }
-  .steps li { margin-bottom:.5rem; }
-  .note { background:var(--card); border:1px solid var(--line); border-left:3px solid var(--accent);
-    border-radius:8px; padding:.9rem 1.1rem; font-size:.95rem; color:var(--muted); }
-  .note strong { color:var(--fg); }
-  footer { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--line);
-    color:var(--muted); font-size:.85rem; }
-  .err { color:#ef4444; font-size:.9rem; margin-top:.6rem; }
+  .copy:hover { background: rgba(255,255,255,.16); }
+  .copy.ok { background: #28c840; color: #062b0f; }
+  .terminal pre { margin: 0; padding: 1rem 1.1rem; overflow-x: auto; }
+  .terminal code {
+    color: var(--code-fg); font-size: .84rem; line-height: 1.5; white-space: pre;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  .hint { font-size: .9rem; color: var(--muted); margin: .8rem 0 0; }
+  .hint code, p code, li code { background: color-mix(in srgb, var(--muted) 15%, transparent);
+    padding: .1em .38em; border-radius: 5px; font-size: .88em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .err { color: var(--err); font-size: .9rem; margin: .75rem 0 0; min-height: 1px; }
+
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: .55rem; }
+  .steps li { display: flex; gap: .75rem; align-items: flex-start; color: var(--fg); }
+  .steps .n { flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; margin-top: .05rem;
+    display: grid; place-items: center; font-size: .8rem; font-weight: 700;
+    background: var(--pill); color: var(--pill-fg); }
+
+  .note { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 1rem 1.15rem; font-size: .93rem; color: var(--muted); }
+  .note strong { color: var(--fg); }
+
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: .85rem; }
+  a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <span class="pill">Screenshot → link</span>
+  <span class="pill">Screenshot → Link</span>
   <h1>shotlink</h1>
   <p class="lede">Upload a local image, get a public link that renders inline in a GitHub PR. No browser, nothing committed to the repo. One command to set up.</p>
 
   <h2>Get your setup command</h2>
   <div class="card">
-    <div class="row">
+    <div class="fields">
       <input id="password" type="password" placeholder="Access password" autocomplete="off" />
       <input id="label" type="text" placeholder="Your name / machine (optional)" autocomplete="off" />
       <button id="gen">Generate</button>
     </div>
     <div id="result" class="result">
-      <p style="margin:.25rem 0 .5rem;font-weight:600;">Paste this into your terminal:</p>
-      <pre><button class="copy" id="copy">Copy</button><code id="cmd"></code></pre>
-      <p class="hint">This mints a personal token. Runs the shotlink MCP locally via <code>npx</code> — no clone, no config. Restart Claude Code after adding.</p>
+      <p class="result-label">Paste this into your terminal</p>
+      <div class="terminal">
+        <div class="term-head">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <button class="copy" id="copy">Copy</button>
+        </div>
+        <pre><code id="cmd"></code></pre>
+      </div>
+      <p class="hint">Mints a personal token and runs the shotlink MCP locally via <code>npx</code> — no clone, no config. Restart Claude Code after adding.</p>
     </div>
     <div id="error" class="err"></div>
   </div>
 
   <h2>Then use it</h2>
   <ol class="steps">
-    <li>Restart Claude Code so it picks up the <code>shotlink</code> MCP server.</li>
-    <li>Ask it to add a screenshot to a PR, or call the tool directly:
-      <br /><code>upload_image(path="/abs/path/shot.png")</code> → a public URL.</li>
-    <li>It embeds the URL with <code>gh</code>; the image renders inline in the PR.</li>
+    <li><span class="n">1</span><span>Restart Claude Code so it picks up the <code>shotlink</code> MCP server.</span></li>
+    <li><span class="n">2</span><span>Ask it to add a screenshot to a PR, or call <code>upload_image(path="/abs/path/shot.png")</code>.</span></li>
+    <li><span class="n">3</span><span>It embeds the returned URL with <code>gh</code> — the image renders inline in the PR.</span></li>
   </ol>
 
   <h2>Security</h2>
-  <p class="note"><strong>Capability URLs.</strong> Uploaded links are public but unguessable — the same model GitHub's own <code>user-attachments</code> uses. Anyone with a link can view that image; nobody can guess it. Fine for UI screenshots; if an image holds PII, treat the link as sensitive. Your token is personal and revocable. Uploads are image-only, max 50 MB.</p>
+  <p class="note"><strong>Capability URLs.</strong> Uploaded links are public but unguessable — the same model GitHub's own <code>user-attachments</code> uses. Anyone with a link can view that image; nobody can guess it. Fine for UI screenshots; treat links to PII-bearing images as sensitive. Your token is personal and revocable. Uploads are image-only, max 50 MB.</p>
 
-  <footer>
-    Hosted on Vercel · <a href="https://github.com/zitianqin/shotlink">source on GitHub</a>
-  </footer>
+  <footer>Hosted on Vercel · <a href="https://github.com/zitianqin/shotlink">source on GitHub</a></footer>
 </div>
 
 <script>
@@ -114,7 +169,7 @@
   async function generate() {
     errEl.textContent = "";
     const password = $("password").value;
-    if (!password) { errEl.textContent = "Enter the access password."; return; }
+    if (!password) { errEl.textContent = "Enter the access password."; $("password").focus(); return; }
     const label = $("label").value.trim();
     genBtn.disabled = true;
     genBtn.textContent = "Generating…";
@@ -139,11 +194,13 @@
 
   genBtn.addEventListener("click", generate);
   $("password").addEventListener("keydown", (e) => { if (e.key === "Enter") generate(); });
+  $("label").addEventListener("keydown", (e) => { if (e.key === "Enter") generate(); });
 
   $("copy").addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(cmdEl.textContent);
-      const b = $("copy"); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500);
+      const b = $("copy"); b.textContent = "Copied"; b.classList.add("ok");
+      setTimeout(() => { b.textContent = "Copy"; b.classList.remove("ok"); }, 1500);
     } catch {}
   });
 </script>
