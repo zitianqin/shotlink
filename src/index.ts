@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { basename, extname } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { upload } from "@vercel/blob/client";
 import { z } from "zod";
 
 // shotlink MCP client. Runs locally (stdio) so it can read local image files,
@@ -46,32 +47,18 @@ async function uploadImage(filePath: string, filename?: string): Promise<string>
   const name = filename ?? basename(filePath);
   const contentType = MIME_BY_EXT[extname(name).toLowerCase()];
 
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${TOKEN}`,
-    },
-    body: JSON.stringify({
-      filename: name,
-      contentType,
-      dataBase64: bytes.toString("base64"),
-    }),
+  // Direct-to-Blob client upload: the bytes go straight to Blob storage (not
+  // through the function), so this isn't bound by Vercel's ~4.5MB body limit.
+  // /api/upload only authorizes it (validates the token in clientPayload).
+  const blob = await upload(name, bytes, {
+    access: "public",
+    handleUploadUrl: ENDPOINT,
+    clientPayload: JSON.stringify({ token: TOKEN }),
+    contentType,
+    multipart: bytes.length > 8 * 1024 * 1024, // parallel parts for big files
   });
 
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`upload failed (${res.status}): ${text}`);
-  }
-
-  let url: unknown;
-  try {
-    url = JSON.parse(text)?.url;
-  } catch {
-    throw new Error(`unexpected response: ${text}`);
-  }
-  if (typeof url !== "string") throw new Error(`response had no url: ${text}`);
-  return url;
+  return blob.url;
 }
 
 const server = new McpServer({ name: "shotlink", version: "0.2.0" });

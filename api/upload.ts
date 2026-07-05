@@ -1,15 +1,28 @@
-import type { Req, Res } from "./_http.js";
-import { put } from "@vercel/blob";
+import type { IncomingMessage } from "node:http";
+import type { Res } from "./_http.js";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { isValidToken } from "./_tokens.js";
 
-// POST /api/upload
-//   Authorization: Bearer <shotlink token>   (sl_...)
-//   Body (JSON): { filename?: string, contentType?: string, dataBase64: string }
-// -> 200 { url } — a public, unguessable Vercel Blob URL.
+// POST /api/upload — Vercel Blob *client upload* handler.
 //
-// Guards: valid per-user token, image content types only, ~4MB max.
+// The file is uploaded directly from the MCP client to Blob storage, NOT through
+// this function, so it isn't bound by Vercel's ~4.5MB function-body limit. This
+// endpoint only (a) authorizes the upload (validates the shotlink token carried in
+// clientPayload) and mints a scoped client token, and (b) receives the
+// upload-completed callback. Guards: image-only, 50MB max.
 
-const MAX_BYTES = 4 * 1024 * 1024;
+type Req = IncomingMessage & { body?: unknown };
+
+const MAX_BYTES = 50 * 1024 * 1024;
+const ALLOWED_CONTENT_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "image/avif",
+  "image/bmp",
+];
 
 export default async function handler(req: Req, res: Res) {
   if (req.method !== "POST") {
@@ -17,69 +30,44 @@ export default async function handler(req: Req, res: Res) {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
-  const header = req.headers.authorization;
-  const auth = Array.isArray(header) ? header[0] : header ?? "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (!(await isValidToken(token))) {
-    return res
-      .status(401)
-      .json({ error: "unauthorized", detail: "missing or invalid shotlink token" });
-  }
-
-  const body = (req.body ?? {}) as {
-    filename?: unknown;
-    contentType?: unknown;
-    dataBase64?: unknown;
-  };
-
-  if (typeof body.dataBase64 !== "string" || body.dataBase64.length === 0) {
-    return res
-      .status(400)
-      .json({ error: "bad_request", detail: "dataBase64 (base64 string) is required" });
-  }
-
-  const contentType =
-    typeof body.contentType === "string" && body.contentType ? body.contentType : undefined;
-  if (contentType && !contentType.startsWith("image/")) {
-    return res.status(415).json({ error: "unsupported_type", detail: "images only" });
-  }
-
-  let buffer: Buffer;
   try {
-    buffer = Buffer.from(body.dataBase64, "base64");
-  } catch {
-    return res.status(400).json({ error: "bad_request", detail: "dataBase64 is not valid base64" });
-  }
-  if (buffer.length === 0) {
-    return res.status(400).json({ error: "bad_request", detail: "decoded image is empty" });
-  }
-  if (buffer.length > MAX_BYTES) {
-    return res
-      .status(413)
-      .json({ error: "too_large", detail: `image exceeds ${MAX_BYTES} bytes` });
-  }
-
-  const filename = sanitizeFilename(
-    typeof body.filename === "string" ? body.filename : undefined,
-  );
-
-  try {
-    const blob = await put(filename, buffer, {
-      access: "public",
-      addRandomSuffix: true, // unguessable capability URL
-      contentType,
+    const jsonResponse = await handleUpload({
+      body: req.body as HandleUploadBody,
+      request: req,
+      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+        let token = "";
+        try {
+          token = (JSON.parse(clientPayload ?? "{}") as { token?: string }).token ?? "";
+        } catch {
+          /* falls through to unauthorized */
+        }
+        if (!(await isValidToken(token))) {
+          throw new UnauthorizedError();
+        }
+        return {
+          allowedContentTypes: ALLOWED_CONTENT_TYPES,
+          maximumSizeInBytes: MAX_BYTES,
+          addRandomSuffix: true, // unguessable capability URL
+        };
+      },
+      // Fired server-to-server by Blob after the upload finishes. Nothing to do.
+      onUploadCompleted: async () => {},
     });
-    return res.status(200).json({ url: blob.url, pathname: blob.pathname });
+    return res.status(200).json(jsonResponse);
   } catch (err) {
+    if (err instanceof UnauthorizedError) {
+      return res
+        .status(401)
+        .json({ error: "unauthorized", detail: "missing or invalid shotlink token" });
+    }
     const detail = err instanceof Error ? err.message : String(err);
-    return res.status(502).json({ error: "blob_upload_failed", detail });
+    return res.status(400).json({ error: "upload_failed", detail });
   }
 }
 
-// Keep only a safe basename; Blob's addRandomSuffix guarantees uniqueness anyway.
-function sanitizeFilename(name: string | undefined): string {
-  if (!name) return "image.png";
-  const base = name.split(/[\\/]/).pop() ?? "image.png";
-  const cleaned = base.replace(/[^A-Za-z0-9._-]/g, "_").replace(/^\.+/, "");
-  return cleaned.length > 0 ? cleaned.slice(0, 128) : "image.png";
+class UnauthorizedError extends Error {
+  constructor() {
+    super("unauthorized");
+    this.name = "UnauthorizedError";
+  }
 }

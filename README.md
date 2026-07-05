@@ -37,7 +37,7 @@ the same posture GitHub's own `user-attachments` uses. You can't have "renders
 inline in a PR" *and* "auth-gated", because GitHub's camo proxy fetches
 anonymously. Anyone with a link can view that image; nobody can guess it. Fine for
 UI screenshots; treat links to PII-bearing images as sensitive. Uploads are
-image-only and capped at 4 MB. Tokens are personal and revocable.
+image-only and capped at 50 MB. Tokens are personal and revocable.
 
 > **v1 note:** token issuance is open (self-serve, unlisted URL). A GitHub org
 > login gate on the *Generate* button is the planned fast-follow.
@@ -67,7 +67,8 @@ step. Rebuild and commit `dist/` whenever you change `src/`.
 
 ## Limits
 
-- **Request size:** Vercel caps function bodies at ~4.5 MB; base64 adds ~33%, so
-  source images up to ~3 MB upload fine (enforced hard at 4 MB decoded).
-- **Types:** png/jpg/gif/webp/svg/avif/bmp get the right content-type by extension.
+- **Size:** up to **50 MB** per image. Uploads go direct-to-Blob (client uploads),
+  so they bypass Vercel's ~4.5 MB function-body limit; the function only authorizes
+  them. Files over 8 MB use multipart (parallel parts).
+- **Types:** png/jpg/gif/webp/svg/avif/bmp (image-only, enforced server-side).
 - **Blobs live forever** — no expiry configured.
