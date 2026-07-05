@@ -1,0 +1,25 @@
+api/token.ts
+  s_92542594e82804::t_6795a99458d2c5 1,5-6,16-20,23-33,37,43-48
+  s_92542594e82804::t_6792f9b1486b70 49
+public/index.html
+  s_92542594e82804::t_a14028c128e911 81-84
+  s_92542594e82804::t_149607e478a308 114,116-118,125,128,136,138-141
+README.md
+  s_92542594e82804::t_b3508f119def16 42-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "a00f552313d0766e96862de24f9cd3d606ee465b",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
