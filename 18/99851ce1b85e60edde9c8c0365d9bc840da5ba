@@ -1,0 +1,27 @@
+api/upload.ts
+  s_92542594e82804::t_29abd97c505d69 71-75,87-91
+  s_92542594e82804::t_560c14cfe5da5a 39,41-43,50-53
+  s_92542594e82804::t_0141af5ba7b22c 54
+  s_92542594e82804::t_5de197315899d7 92-93
+src/index.ts
+  s_92542594e82804::t_e2e04786cf8853 26
+  s_92542594e82804::t_1610598a01bc9a 51-56,59,63
+dist/index.js
+  s_92542594e82804::t_2c6d7cb1697e81 22,41-43,46,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1899851ce1b85e60edde9c8c0365d9bc840da5ba",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
