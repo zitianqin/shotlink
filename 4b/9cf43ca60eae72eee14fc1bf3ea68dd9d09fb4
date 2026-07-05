@@ -1,0 +1,24 @@
+dist/index.js
+  s_92542594e82804::t_00e9ecd47e0c23 13,34
+README.md
+  s_92542594e82804::t_00e9ecd47e0c23 25
+src/index.ts
+  s_92542594e82804::t_9b4bf6e354194c 41
+  s_92542594e82804::t_c1f04b40026074 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4b9cf43ca60eae72eee14fc1bf3ea68dd9d09fb4",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
