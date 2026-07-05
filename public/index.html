@@ -1,12 +1,145 @@
 <!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8" />
-<title>image-self-host-mcp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
+<title>image-self-host-mcp</title>
 <style>
-  body { font: 15px/1.6 system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; color: #222; }
-  code { background: #f4f4f5; padding: 0.1em 0.35em; border-radius: 4px; }
-  @media (prefers-color-scheme: dark) { body { background: #111; color: #ddd; } code { background: #27272a; } }
+  :root {
+    --bg: #ffffff; --fg: #18181b; --muted: #6b7280; --line: #e5e7eb;
+    --card: #f9fafb; --code-bg: #f4f4f5; --accent: #4f46e5; --accent-fg: #ffffff;
+    --pill: #eef2ff; --pill-fg: #4338ca;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0d; --fg: #ececf1; --muted: #9ca3af; --line: #26262b;
+      --card: #141417; --code-bg: #1c1c21; --accent: #6366f1; --accent-fg: #ffffff;
+      --pill: #1e1b32; --pill-fg: #a5b4fc;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --fg: #18181b; --muted: #6b7280; --line: #e5e7eb;
+    --card: #f9fafb; --code-bg: #f4f4f5; --accent: #4f46e5; --accent-fg: #ffffff;
+    --pill: #eef2ff; --pill-fg: #4338ca;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0b0d; --fg: #ececf1; --muted: #9ca3af; --line: #26262b;
+    --card: #141417; --code-bg: #1c1c21; --accent: #6366f1; --accent-fg: #ffffff;
+    --pill: #1e1b32; --pill-fg: #a5b4fc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 4rem 1.25rem 6rem; }
+  header { margin-bottom: 2.5rem; }
+  .pill {
+    display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; background: var(--pill); color: var(--pill-fg);
+    padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 1rem;
+  }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 0.6rem; letter-spacing: -0.02em; }
+  .lede { font-size: 1.12rem; color: var(--muted); margin: 0; }
+  h2 { font-size: 1.15rem; margin: 2.75rem 0 0.85rem; letter-spacing: -0.01em; }
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: var(--code-bg); padding: 0.12em 0.4em; border-radius: 5px; font-size: 0.9em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .endpoint {
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.85rem 1rem; margin: 0.5rem 0 0;
+  }
+  .endpoint .method { font-weight: 700; color: var(--pill-fg); font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  .endpoint .path { font-family: ui-monospace, monospace; font-size: 0.9rem; word-break: break-all; }
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
+  .steps > li {
+    position: relative; counter-increment: s; padding-left: 2.6rem; margin-bottom: 1.6rem;
+  }
+  .steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: 0;
+    width: 1.75rem; height: 1.75rem; border-radius: 50%;
+    background: var(--accent); color: var(--accent-fg);
+    font-size: 0.9rem; font-weight: 700; display: grid; place-items: center;
+  }
+  .steps h3 { font-size: 1rem; margin: 0.15rem 0 0.5rem; font-weight: 600; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.9rem 1rem; overflow-x: auto; margin: 0.5rem 0 0;
+  }
+  pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.6; }
+  .note {
+    background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 0.9rem 1.1rem; font-size: 0.95rem; color: var(--muted);
+  }
+  .note strong { color: var(--fg); }
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 0.85rem; }
 </style>
-<h1>image-self-host-mcp</h1>
-<p>Image upload service. The only endpoint is <code>POST /api/upload</code> (bearer-authenticated).</p>
-<p>Uploaded images are served from Vercel Blob at unguessable public URLs.</p>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="pill">MCP · Vercel Blob</span>
+    <h1>image-self-host-mcp</h1>
+    <p class="lede">Upload a local image, get a public unguessable URL. Built to embed screenshots in GitHub PRs — no browser, nothing committed to the repo.</p>
+  </header>
+
+  <h2>The endpoint</h2>
+  <p>One authenticated route. It stores bytes in Vercel Blob and returns a public, CDN-served URL that GitHub renders inline (even on private repos).</p>
+  <div class="endpoint">
+    <span class="method">POST</span>
+    <span class="path">/api/upload</span>
+  </div>
+
+  <h2>Set up the MCP tool</h2>
+  <p>The <code>upload_image</code> tool runs locally and talks to this endpoint. Wire it into Claude Code once:</p>
+
+  <ol class="steps">
+    <li>
+      <h3>Clone &amp; build the MCP server</h3>
+      <pre><code>git clone https://github.com/zitianqin/image-self-host-mcp
+cd image-self-host-mcp
+npm install &amp;&amp; npm run build</code></pre>
+    </li>
+    <li>
+      <h3>Get your upload token</h3>
+      <p>This is the shared secret the endpoint checks. Whoever deployed the Vercel project set it as the <code>UPLOAD_TOKEN</code> env var — copy that same value.</p>
+      <pre><code># if you deployed it, read or (re)generate:
+vercel env pull            # pulls into .env.local
+# or mint a fresh one:  openssl rand -hex 32  → vercel env add UPLOAD_TOKEN</code></pre>
+    </li>
+    <li>
+      <h3>Register the server with Claude Code</h3>
+      <pre><code>claude mcp add-json --scope user image-host '{
+  "command": "node",
+  "args": ["/ABS/PATH/image-self-host-mcp/dist/index.js"],
+  "env": {
+    "IMAGE_HOST_ENDPOINT": "https://image-self-host-mcp.vercel.app/api/upload",
+    "IMAGE_HOST_TOKEN": "&lt;your UPLOAD_TOKEN&gt;"
+  }
+}'</code></pre>
+    </li>
+    <li>
+      <h3>Use it</h3>
+      <p>In a new Claude Code session, call the tool (or just ask to add a screenshot to a PR):</p>
+      <pre><code>upload_image(path="/abs/path/shot.png")
+# → https://&lt;hash&gt;.public.blob.vercel-storage.com/shot-&lt;random&gt;.png
+
+gh pr edit 123 --body "![screenshot]($URL)"</code></pre>
+    </li>
+  </ol>
+
+  <h2>Security</h2>
+  <p class="note"><strong>Capability URLs.</strong> Returned links are public but unguessable — the same model GitHub's own <code>user-attachments</code> uses. Anyone with a link can view the image; nobody can guess it. Fine for UI screenshots. If an image holds PII, treat the link as sensitive — an unguessable link is still exfiltratable if it leaks. Blobs live forever until deleted.</p>
+
+  <footer>
+    Self-hostable on Vercel · <a href="https://github.com/zitianqin/image-self-host-mcp">source on GitHub</a>
+  </footer>
+</div>
+</body>
+</html>
