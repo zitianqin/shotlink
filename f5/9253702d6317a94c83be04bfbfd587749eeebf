@@ -1,0 +1,32 @@
+api/auth/login.ts
+  s_92542594e82804::t_4ed70a69ff842f 1-18
+api/auth/callback.ts
+  s_92542594e82804::t_d95ba9e0526cdb 1-35
+api/_http.ts
+  s_92542594e82804::t_88c1e6fa0324dc 6,14-16
+api/_auth.ts
+  s_92542594e82804::t_9e76766a63e04d 1-130
+README.md
+  s_92542594e82804::t_ae348e0b62fa10 42-46
+public/index.html
+  s_92542594e82804::t_2608864942bc7e 81-86
+  s_92542594e82804::t_a52fc37f6ebdfe 115-131,141,144-149,154,157
+api/token.ts
+  s_92542594e82804::t_6d289ae2630eab 3,5-6,16-24,27,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f59253702d6317a94c83be04bfbfd587749eeebf",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
