@@ -1,0 +1,20 @@
+public/index.html
+  s_92542594e82804::t_1fe9675083f12f 10-15,19-21,23-24,27-29,31,34-57,59-64,66-67,69-72,74-87,89-91,93-101,103-122,127,133,139-147,154-156,160,162,172,197,202-203
+  s_92542594e82804::t_cb57120bfd91fa 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "9e09a65804ad250998e4a2f0cf2d3f5e8cea58e2",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
