@@ -1,0 +1,30 @@
+api/upload.ts
+  s_92542594e82804::t_50ca73a0f41bec 77
+  s_92542594e82804::t_6efdbed62dc187 12
+  s_92542594e82804::t_f0fabca79a1124 25-27
+src/index.ts
+  s_92542594e82804::t_af320ac20ee2fd 56
+  s_92542594e82804::t_b312637aa543fa 37-39
+  s_92542594e82804::t_ab1b400df24897 79,81-84,86
+README.md
+  s_92542594e82804::t_a43a3475557936 40
+  s_92542594e82804::t_5d24fd43b41d79 72,75-80
+dist/index.js
+  s_92542594e82804::t_fefd9071c1ee02 32-34,45,61-65,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "94aa754217e6b5552ea90159dc007725d7c28505",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
