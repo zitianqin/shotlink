@@ -34,6 +34,9 @@ const MIME_BY_EXT: Record<string, string> = {
   ".svg": "image/svg+xml",
   ".avif": "image/avif",
   ".bmp": "image/bmp",
+  ".mp4": "video/mp4",
+  ".mov": "video/quicktime",
+  ".webm": "video/webm",
 };
 
 async function uploadImage(filePath: string, filename?: string): Promise<string> {
@@ -50,7 +53,7 @@ async function uploadImage(filePath: string, filename?: string): Promise<string>
 
   if (bytes.length > MAX_BYTES) {
     throw new Error(
-      `image is ${(bytes.length / 1048576).toFixed(1)}MB; shotlink's limit is 50MB`,
+      `file is ${(bytes.length / 1048576).toFixed(1)}MB; shotlink's limit is 50MB`,
     );
   }
 
@@ -73,13 +76,14 @@ const server = new McpServer({ name: "shotlink", version: "0.2.0" });
 server.registerTool(
   "upload_image",
   {
-    title: "Upload image",
+    title: "Upload image or video",
     description:
-      "Upload a local image file to shotlink and return a public, unguessable URL. " +
-      "Use it to embed screenshots in GitHub PR descriptions/comments (the URL renders " +
-      "inline, no browser or committed file needed).",
+      "Upload a local image or video file (mp4/mov/webm) to shotlink and return a public, " +
+      "unguessable URL. Use it to embed screenshots in GitHub PR descriptions/comments (the " +
+      "URL renders inline, no browser or committed file needed). Note: GitHub only renders " +
+      "images inline — for videos, embed a GIF preview and link the mp4.",
     inputSchema: {
-      path: z.string().describe("Absolute path to the local image file to upload"),
+      path: z.string().describe("Absolute path to the local image or video file to upload"),
       filename: z
         .string()
         .optional()

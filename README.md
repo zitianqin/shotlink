@@ -37,7 +37,7 @@ the same posture GitHub's own `user-attachments` uses. You can't have "renders
 inline in a PR" *and* "auth-gated", because GitHub's camo proxy fetches
 anonymously. Anyone with a link can view that image; nobody can guess it. Fine for
 UI screenshots; treat links to PII-bearing images as sensitive. Uploads are
-image-only and capped at 50 MB. Tokens are personal and revocable.
+image/video only and capped at 50 MB. Tokens are personal and revocable.
 
 **Token issuance is gated** by a shared access password: enter it on the landing
 page to mint a personal token. The password lives only in the `ACCESS_PASSWORD`
@@ -69,8 +69,13 @@ step. Rebuild and commit `dist/` whenever you change `src/`.
 
 ## Limits
 
-- **Size:** up to **50 MB** per image. Uploads go direct-to-Blob (client uploads),
+- **Size:** up to **50 MB** per file. Uploads go direct-to-Blob (client uploads),
   so they bypass Vercel's ~4.5 MB function-body limit; the function only authorizes
   them. Files over 8 MB use multipart (parallel parts).
-- **Types:** png/jpg/gif/webp/svg/avif/bmp (image-only, enforced server-side).
+- **Types:** images (png/jpg/gif/webp/svg/avif/bmp) and videos (mp4/mov/webm),
+  enforced server-side.
+- **Videos on GitHub:** external video URLs do **not** render as inline players in
+  PRs/issues — GitHub's camo proxy only inlines images. Convention: upload a short
+  **GIF preview** (renders inline) plus the mp4, and link the mp4 as a plain
+  markdown link under the GIF.
 - **Blobs live forever** — no expiry configured.

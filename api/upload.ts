@@ -9,7 +9,7 @@ import { isValidToken } from "./_tokens.js";
 // this function, so it isn't bound by Vercel's ~4.5MB function-body limit. This
 // endpoint only (a) authorizes the upload (validates the shotlink token carried in
 // clientPayload) and mints a scoped client token, and (b) receives the
-// upload-completed callback. Guards: image-only, 50MB max.
+// upload-completed callback. Guards: image/video only, 50MB max.
 
 type Req = IncomingMessage & { body?: unknown };
 
@@ -22,6 +22,9 @@ const ALLOWED_CONTENT_TYPES = [
   "image/svg+xml",
   "image/avif",
   "image/bmp",
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
 ];
 
 export default async function handler(req: Req, res: Res) {
@@ -71,7 +74,7 @@ export default async function handler(req: Req, res: Res) {
     if (err instanceof TooLargeError) {
       return res
         .status(413)
-        .json({ error: "too_large", detail: `image exceeds ${MAX_BYTES} bytes (50MB)` });
+        .json({ error: "too_large", detail: `file exceeds ${MAX_BYTES} bytes (50MB)` });
     }
     const detail = err instanceof Error ? err.message : String(err);
     return res.status(400).json({ error: "upload_failed", detail });

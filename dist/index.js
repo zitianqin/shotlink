@@ -29,6 +29,9 @@ const MIME_BY_EXT = {
     ".svg": "image/svg+xml",
     ".avif": "image/avif",
     ".bmp": "image/bmp",
+    ".mp4": "video/mp4",
+    ".mov": "video/quicktime",
+    ".webm": "video/webm",
 };
 async function uploadImage(filePath, filename) {
     if (!TOKEN) {
@@ -39,7 +42,7 @@ async function uploadImage(filePath, filename) {
     const name = filename ?? basename(filePath);
     const contentType = MIME_BY_EXT[extname(name).toLowerCase()];
     if (bytes.length > MAX_BYTES) {
-        throw new Error(`image is ${(bytes.length / 1048576).toFixed(1)}MB; shotlink's limit is 50MB`);
+        throw new Error(`file is ${(bytes.length / 1048576).toFixed(1)}MB; shotlink's limit is 50MB`);
     }
     // Direct-to-Blob client upload: the bytes go straight to Blob storage (not
     // through the function), so this isn't bound by Vercel's ~4.5MB body limit.
@@ -55,12 +58,13 @@ async function uploadImage(filePath, filename) {
 }
 const server = new McpServer({ name: "shotlink", version: "0.2.0" });
 server.registerTool("upload_image", {
-    title: "Upload image",
-    description: "Upload a local image file to shotlink and return a public, unguessable URL. " +
-        "Use it to embed screenshots in GitHub PR descriptions/comments (the URL renders " +
-        "inline, no browser or committed file needed).",
+    title: "Upload image or video",
+    description: "Upload a local image or video file (mp4/mov/webm) to shotlink and return a public, " +
+        "unguessable URL. Use it to embed screenshots in GitHub PR descriptions/comments (the " +
+        "URL renders inline, no browser or committed file needed). Note: GitHub only renders " +
+        "images inline — for videos, embed a GIF preview and link the mp4.",
     inputSchema: {
-        path: z.string().describe("Absolute path to the local image file to upload"),
+        path: z.string().describe("Absolute path to the local image or video file to upload"),
         filename: z
             .string()
             .optional()
