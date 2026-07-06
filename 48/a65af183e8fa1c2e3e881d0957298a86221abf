@@ -1,0 +1,19 @@
+README.md
+  s_92542594e82804::t_3afd880158e5cc 82-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "48a65af183e8fa1c2e3e881d0957298a86221abf",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
