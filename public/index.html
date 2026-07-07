@@ -79,6 +79,11 @@
   .result.show { display: block; animation: rise .28s ease both; }
   @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   .result-label { font-size: .8rem; font-weight: 600; color: var(--muted); margin: 0 0 .5rem; }
+  .others { margin-top: 1rem; }
+  .others summary { font-size: .82rem; font-weight: 600; color: var(--muted); cursor: pointer; user-select: none; }
+  .others summary:hover { color: var(--fg); }
+  .others .terminal { margin-bottom: .9rem; }
+  .other-label { font-size: .78rem; font-weight: 600; color: var(--muted); margin: .9rem 0 .4rem; }
 
   .terminal { border-radius: 12px; overflow: hidden; border: 1px solid var(--code-line); background: var(--code-bg); }
   .term-head {
@@ -145,6 +150,14 @@
         <pre><code id="cmd"></code></pre>
       </div>
       <p class="hint">Mints a personal token and runs the shotlink MCP locally via <code>npx</code> — no clone, no config. Restart Claude Code after adding.</p>
+      <details class="others">
+        <summary>Other clients (Codex, Cursor, Claude Desktop, Gemini…)</summary>
+        <p class="hint">Same server everywhere — <code>npx -y github:zitianqin/shotlink --token=…</code> over stdio. Only Node 18+ is needed.</p>
+        <p class="other-label">Codex CLI — add to <code>~/.codex/config.toml</code></p>
+        <div class="terminal"><div class="term-head"><span class="dots"><i></i><i></i><i></i></span><button class="copy" data-copy="snip-toml">Copy</button></div><pre><code id="snip-toml"></code></pre></div>
+        <p class="other-label">Cursor (<code>~/.cursor/mcp.json</code>) · Windsurf · Claude Desktop (<code>claude_desktop_config.json</code>) · Gemini CLI (<code>~/.gemini/settings.json</code>)</p>
+        <div class="terminal"><div class="term-head"><span class="dots"><i></i><i></i><i></i></span><button class="copy" data-copy="snip-json">Copy</button></div><pre><code id="snip-json"></code></pre></div>
+      </details>
     </div>
     <div id="error" class="err"></div>
   </div>
@@ -183,6 +196,10 @@
       if (res.status === 401) throw new Error("Wrong access password.");
       if (!res.ok) throw new Error(data.detail || data.error || ("HTTP " + res.status));
       cmdEl.textContent = data.command;
+      $("snip-toml").textContent =
+        '[mcp_servers.shotlink]\ncommand = "npx"\nargs = ["-y", "github:zitianqin/shotlink", "--token=' + data.token + '"]';
+      $("snip-json").textContent =
+        '{\n  "mcpServers": {\n    "shotlink": {\n      "command": "npx",\n      "args": ["-y", "github:zitianqin/shotlink", "--token=' + data.token + '"]\n    }\n  }\n}';
       result.classList.add("show");
     } catch (e) {
       errEl.textContent = e.message;
@@ -196,12 +213,15 @@
   $("password").addEventListener("keydown", (e) => { if (e.key === "Enter") generate(); });
   $("label").addEventListener("keydown", (e) => { if (e.key === "Enter") generate(); });
 
-  $("copy").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(cmdEl.textContent);
-      const b = $("copy"); b.textContent = "Copied"; b.classList.add("ok");
-      setTimeout(() => { b.textContent = "Copy"; b.classList.remove("ok"); }, 1500);
-    } catch {}
+  document.querySelectorAll(".copy").forEach((b) => {
+    b.addEventListener("click", async () => {
+      const src = b.dataset.copy ? $(b.dataset.copy) : cmdEl;
+      try {
+        await navigator.clipboard.writeText(src.textContent);
+        b.textContent = "Copied"; b.classList.add("ok");
+        setTimeout(() => { b.textContent = "Copy"; b.classList.remove("ok"); }, 1500);
+      } catch {}
+    });
   });
 </script>
 </body>
