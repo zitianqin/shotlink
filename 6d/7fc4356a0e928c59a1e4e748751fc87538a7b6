@@ -1,0 +1,22 @@
+public/index.html
+  s_92542594e82804::t_5d2bd9fec4a749 82-86
+  s_92542594e82804::t_cd1d37fc7b919a 216-224
+  s_92542594e82804::t_bbfa2638b75de4 153-160
+  s_92542594e82804::t_1490ab0e56c30a 199-202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "6d7fc4356a0e928c59a1e4e748751fc87538a7b6",
+  "prompts": {},
+  "sessions": {
+    "s_92542594e82804": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b25c75-55b6-4630-920f-a8e73b097fd6",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Zitian Qin <zitianqin2015@gmail.com>"
+    }
+  }
+}
