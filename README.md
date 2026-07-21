@@ -79,3 +79,11 @@ step. Rebuild and commit `dist/` whenever you change `src/`.
   **GIF preview** (renders inline) plus the mp4, and link the mp4 as a plain
   markdown link under the GIF.
 - **Blobs live forever** — no expiry configured.
+
+## Videos
+
+GitHub never renders external video URLs as an inline player (camo only proxies
+images). The team convention: record with the `record-browser` skill (headless
+Playwright) or ⌘⇧5, upload via the `video-link` skill (rclone → Google Drive),
+and paste the Drive link in the PR. Small mp4s (<50 MB) can also go through
+shotlink's `upload_image` as a plain link.
