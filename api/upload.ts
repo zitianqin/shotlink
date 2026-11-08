@@ -1,7 +1,7 @@
 import type { IncomingMessage } from "node:http";
 import type { Res } from "./_http.js";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { isValidToken } from "./_tokens.js";
+import { isValidToken, uploaderId } from "./_tokens.js";
 
 // POST /api/upload — Vercel Blob *client upload* handler.
 //
@@ -37,7 +37,7 @@ export default async function handler(req: Req, res: Res) {
     const jsonResponse = await handleUpload({
       body: req.body as HandleUploadBody,
       request: req,
-      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
         let token = "";
         let size = 0;
         try {
@@ -48,6 +48,12 @@ export default async function handler(req: Req, res: Res) {
           /* falls through to unauthorized */
         }
         if (!(await isValidToken(token))) {
+          throw new UnauthorizedError();
+        }
+        // Clients >= 0.3 upload to `u/<uploaderId>/name` so uploads are attributable.
+        // The client token is signed for this exact pathname, so a `u/` path must be
+        // the caller's own folder. Older clients (no prefix) are still accepted.
+        if (pathname.startsWith("u/") && !pathname.startsWith(`u/${uploaderId(token)}/`)) {
           throw new UnauthorizedError();
         }
         // maximumSizeInBytes is only enforced for single-request uploads, not

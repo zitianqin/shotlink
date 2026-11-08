@@ -1,6 +1,6 @@
 {
   "name": "shotlink-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "shotlink — upload a local image, get a public inline-rendering URL. MCP tool for embedding screenshots in GitHub PRs, no browser, nothing committed to the repo.",
   "type": "module",
   "bin": {

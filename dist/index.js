@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, extname } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -47,7 +48,10 @@ async function uploadImage(filePath, filename) {
     // Direct-to-Blob client upload: the bytes go straight to Blob storage (not
     // through the function), so this isn't bound by Vercel's ~4.5MB body limit.
     // /api/upload only authorizes it (validates the token + size in clientPayload).
-    const blob = await upload(name, bytes, {
+    // Upload into this token's folder so the server can attribute it. The id must
+    // match api/_tokens.ts uploaderId(): first 12 hex of sha256(token).
+    const uploader = createHash("sha256").update(TOKEN).digest("hex").slice(0, 12);
+    const blob = await upload(`u/${uploader}/${name}`, bytes, {
         access: "public",
         handleUploadUrl: ENDPOINT,
         clientPayload: JSON.stringify({ token: TOKEN, size: bytes.length }),
@@ -56,7 +60,7 @@ async function uploadImage(filePath, filename) {
     });
     return blob.url;
 }
-const server = new McpServer({ name: "shotlink", version: "0.2.0" });
+const server = new McpServer({ name: "shotlink", version: "0.3.0" });
 server.registerTool("upload_image", {
     title: "Upload image or video",
     description: "Upload a local image or video file (mp4/mov/webm) to shotlink and return a public, " +

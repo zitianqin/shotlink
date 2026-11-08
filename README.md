@@ -67,6 +67,19 @@ npm run build               # compiles src → dist (uses npx typescript)
 `dist/` is committed on purpose so `npx github:zitianqin/shotlink` needs no build
 step. Rebuild and commit `dist/` whenever you change `src/`.
 
+## Admin: who uploaded what
+
+Clients >= 0.3 upload to `u/<user-id>/<file>`, where the id is the first 12 hex
+of the token's record hash (the server rejects a `u/` path that isn't the
+caller's own). To list every token with its latest uploads:
+
+```bash
+vercel env pull .env.local
+node --env-file=.env.local scripts/users.mjs        # 10 per user; pass a number to change
+```
+
+Uploads from older clients (no `u/` prefix) can't be attributed.
+
 ## Limits
 
 - **Size:** up to **50 MB** per file. Uploads go direct-to-Blob (client uploads),

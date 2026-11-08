@@ -24,6 +24,15 @@ function pathFor(token: string): string {
   return `${PREFIX}${hash}.json`;
 }
 
+/**
+ * Public per-user id used as the upload folder (`u/<id>/...`): the first 12 hex of
+ * the token's record hash. Not secret — it only groups a user's uploads; the other
+ * 52 hex of the hash still keep the record path unguessable.
+ */
+export function uploaderId(token: string): string {
+  return createHash("sha256").update(token).digest("hex").slice(0, 12);
+}
+
 export async function issueToken(label: string | undefined, createdAt: string): Promise<string> {
   const token = "sl_" + randomBytes(20).toString("hex");
   const record: TokenRecord = { createdAt, ...(label ? { label } : {}) };
